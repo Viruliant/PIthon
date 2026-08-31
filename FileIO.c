@@ -237,18 +237,6 @@ void taco_test(void) {
 // uint32_t = member_count
 
 #if INTERFACE
-typedef struct {
-    uint16_t y; // max_val = ?
-    uint16_t m : 4; // max_val = 12
-    uint16_t d : 5; // max_val = 31
-    uint16_t h : 5; // max_val = 24
-    uint16_t n : 6; // max_val = 60
-    uint16_t s : 6; // max_val = 60
-} date;
-
-typedef struct LLNode_uint8_t LLNode_uint8_t;
-typedef struct LLDeck_uint8_t LLDeck_uint8_t;
-
 typedef struct { // 2 bits encode 4 scenarios(1, 2, 4, 8)
     uint8_t v0 : 2; // max_val = 3
     uint8_t v1 : 2; // max_val = 3
