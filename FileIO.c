@@ -82,6 +82,7 @@ then writes it to another file "out.txt"
 
 /////////////////////////////////
 
+#if !INTERFACE
 DEFINE_LLDECK(uint8_t) // creates the following funcs
 // bool Start_LLDeck_uint8_t (uint8_t **xref, LLDeck_uint8_t** pile);
 // uint64_t Size_LLDeck_uint8_t (LLDeck_uint8_t** pile);
@@ -90,6 +91,7 @@ DEFINE_LLDECK(uint8_t) // creates the following funcs
 // bool popEnd_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
 // void pushStart_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
 // void pushEnd_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
+#endif
 
 
 /////////////////////////////////
