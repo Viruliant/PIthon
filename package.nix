@@ -22,22 +22,22 @@ stdenv.mkDerivation (rec {
 
   buildPhase = ''
     makeheaders -local ./pargs.c
-    makeheaders -local ./FileIO.c
+    makeheaders -local ./testFileIO.c
     $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
-    $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include FileIO.c -L${minimus}/lib -lNuClear -o FileIO
+    $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include testFileIO.c -L${minimus}/lib -lNuClear -o testFileIO
   '';
 
   installPhase = ''
     runHook preInstall
     mkdir -p $out/bin
     install -Dm755 pargs $out/bin/pargs
-    install -Dm755 FileIO $out/bin/FileIO
+    install -Dm755 testFileIO $out/bin/testFileIO
     runHook postInstall
   '';
 
   preFixup = ''
     patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
-    patchelf --set-rpath "${minimus}/lib" $out/bin/FileIO
+    patchelf --set-rpath "${minimus}/lib" $out/bin/testFileIO
   '';
 
   outputs = [ "out" ];
