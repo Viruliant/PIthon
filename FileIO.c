@@ -78,6 +78,15 @@ then writes it to another file "out.txt"
 
 /* ____________________makeheaders Pre-Defined Data Structures */
 
+typedef struct {
+    uint16_t y; // max_val = ?
+    uint16_t m : 4; // max_val = 12
+    uint16_t d : 5; // max_val = 31
+    uint16_t h : 5; // max_val = 24
+    uint16_t n : 6; // max_val = 60
+    uint16_t s : 6; // max_val = 60
+} date;
+
 #endif // EXPORT_INTERFACE
 
 /////////////////////////////////
@@ -274,17 +283,6 @@ uint8_t get_2bit(const uint8_t *array, int index) {
 }
 
 /////////////////////////////////
-
-
-typedef struct {
-    uint16_t y; // max_val = ?
-    uint16_t m : 4; // max_val = 12
-    uint16_t d : 5; // max_val = 31
-    uint16_t h : 5; // max_val = 24
-    uint16_t n : 6; // max_val = 60
-    uint16_t s : 6; // max_val = 60
-    // date Unix_Epoch = { 1970, 1, 1, 0, 0, 0 };
-} date;
 
 // Function to get the current system time and pack it into the 'date' struct
 date get_system_date() {
