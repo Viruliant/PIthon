@@ -69,15 +69,6 @@ then writes it to another file "out.txt"
 #include <lldeck.h>
 #include <NuClear.h>
 
-#include <set_priv.h>/*////////////////////////////////////////*/
-// include automated local declarations last needs
-#include "FileIO.h" // generate with makeheaders
-/////////////////////////////////////////////////////////////////
-
-#if INTERFACE/* ___makeheaders Pre-Defined Constants INTERFACE */
-
-/* ____________________makeheaders Pre-Defined Data Structures */
-
 typedef struct {
     uint16_t y; // max_val = ?
     uint16_t m : 4; // max_val = 12
@@ -86,6 +77,15 @@ typedef struct {
     uint16_t n : 6; // max_val = 60
     uint16_t s : 6; // max_val = 60
 } date;
+
+#include <set_priv.h>/*////////////////////////////////////////*/
+// include automated local declarations last needs
+#include "FileIO.h" // generate with makeheaders
+/////////////////////////////////////////////////////////////////
+
+#if INTERFACE/* ___makeheaders Pre-Defined Constants INTERFACE */
+
+/* ____________________makeheaders Pre-Defined Data Structures */
 
 #endif // EXPORT_INTERFACE
 
