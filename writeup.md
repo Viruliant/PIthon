@@ -107,11 +107,44 @@ loaded in memory.
 
 ---
 
-## Type 4: Local Library Object File - (not yet implemented)
+## Type 4: Local Library Object File - `FileIO.c`
 
-Type 4 would be a `.c` file compiled to a `.o` object file with 
+Type 4 is a `.c` file compiled to a `.o` object file with 
 local includes (`#include "foo.h"`). The target is a single 
 translation unit's object code, not a full library. This type is 
 used when you want to ship a compiled object that gets linked 
-into a larger program but isn't a standalone library. None of the 
-current minimus or PIthon sources exercise this pattern yet.
+into a larger program but isn't a standalone library.
+
+The makeheaders step generates `FileIO.h` with function 
+prototypes and exported macros, while the actual function bodies 
+live only in the `.o`. This separation means consumers compile 
+against the header but link against the object file.
+
+The nix build and install split this into two phases. Build 
+compiles the object file:
+
+### example `FileIO.c`
+
+```
+$CC -c -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h \
+    -include NuClear.h FileIO.c -o FileIO.o
+```
+
+Install copies the header to `$out/include/FileIO.h` and the 
+object file to `$out/lib/FileIO.o`. Consumers reference both 
+paths: `-I${minimus}/include` for compilation and 
+`FileIO.o` directly in the link command. Unlike a shared library, 
+the object file is statically linked into the consumer at build 
+time - there is no runtime loading. The object file contains the 
+compiled machine code for `FileIO.c`'s functions: `objct2deck()`, 
+`deck2file_nobuf()`, `file2deck()`, `deck2objct()`, and 
+`OBJcmprd2deck()`.
+
+`FileIO.c` defines these serialization functions that convert 
+between memory structures and byte decks, then gets built into 
+`FileIO.o`. The consumer (`testFileIO.c`) includes `FileIO.h` for 
+prototypes and links against `FileIO.o` for the implementations.
+
+This pattern is lighter than a shared library - no `-fPIC` flag 
+is needed, no `.so` is produced. The object file is simply archive 
+material that gets statically linked into the final executable.

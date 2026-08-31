@@ -22,9 +22,11 @@ stdenv.mkDerivation (rec {
 
   buildPhase = ''
     makeheaders -local ./pargs.c
+    makeheaders -local ./FileIO.c
     makeheaders -local ./testFileIO.c
     $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
-    $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include testFileIO.c -L${minimus}/lib -lNuClear -o testFileIO
+    $CC -c -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h FileIO.c -o FileIO.o
+    $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include testFileIO.c FileIO.o -L${minimus}/lib -lNuClear -o testFileIO
   '';
 
   installPhase = ''

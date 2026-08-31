@@ -49,6 +49,7 @@ DEFINE_LLDECK(uint8_t)
 #include <set_priv.h>/*////////////////////////////////////////*/
 // include automated local declarations last needs
 #include "testFileIO.h" // generate with makeheaders
+#include "FileIO.h"     // generate with makeheaders
 /////////////////////////////////////////////////////////////////
 
 /*///////////////////////////////
@@ -85,76 +86,9 @@ int main() {
 }
 
 /////////////////////////////////
-
-// load your data to a deck
-LLDeck_uint8_t * objct2deck(void *xref, size_t size) {
-    uint8_t *bytes = (uint8_t *)xref;
-    LLDeck_uint8_t* deck = NewClear(LLDeck_uint8_t);
-    for (size_t i = 0; i < size; i++) {
-        uint8_t val = bytes[i];
-        pushEnd_LLDeck_uint8_t(&val, &deck);
-    }
-
-    return deck;
-}
-
-// save that deck to a file
-void deck2file_nobuf(const char *path, LLDeck_uint8_t **deck) {
-    FILE *fp = fopen(path, "wb");
-    assert(fp != NULL);
-    uint8_t byte;
-    while (popStart_LLDeck_uint8_t(&byte, deck)) {
-        size_t nwritten = fwrite(&byte, 1, 1, fp);
-        assert(nwritten == 1);
-    }
-    fclose(fp);
-}
-
-// when the program starts back up read that file into a deck
-LLDeck_uint8_t * file2deck(const char *path) {
-    FILE *fp = fopen(path, "rb");
-    LLDeck_uint8_t* deck = NewClear(LLDeck_uint8_t);
-    if (fp) { // file exists
-        uint8_t byte;
-        while (fread(&byte, 1, 1, fp) == 1) {
-            pushEnd_LLDeck_uint8_t(&byte, &deck);
-        }
-        fclose(fp);
-    } else {
-        fprintf(stderr, "Error: file '%s' does not exist or cannot be opened.\n", path);
-    }
-    return deck;
-}
-
-// load that deck into you data structures
-void deck2objct(void *xref, size_t size, LLDeck_uint8_t **deck) {
-    uint8_t *bytes = (uint8_t *)xref;
-    for (size_t i = 0; i < size; i++) {
-        uint8_t val;
-        bool ok = popStart_LLDeck_uint8_t(&val, deck);
-        assert(ok);
-        bytes[i] = val;
-    }
-}
-
-// compare bytes to deck
-bool OBJcmprd2deck(void *xref, size_t size, LLDeck_uint8_t **deck) {
-    if (deck == NULL || *deck == NULL) return false;
-    // if (Size_LLDeck_uint8_t(deck) != size) return false; // size matches
-    if (size == 0) return true;
-    if (Size_LLDeck_uint8_t(deck) < size) return false; // deck is large enough
-    LLNode_uint8_t *curr = NULL;
-    if (!Start_LLDeck_uint8_t(&curr, deck)) return false;
-
-    const uint8_t *bytes = (const uint8_t *)xref;
-    for (size_t i = 0; i < size; i++) {
-        if (curr == NULL || curr->data != bytes[i]) {
-            return false;
-        }
-        curr = curr->next;
-    }
-    return true;
-}
+// FileIO functions (objct2deck, deck2file_nobuf, file2deck,
+// deck2objct, OBJcmprd2deck) are in FileIO.c / FileIO.h
+/////////////////////////////////
 
 void taco_test(void) {
     char test_cstr[] = "tacos"; // Includes trailing '\0' (6 bytes total)
