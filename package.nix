@@ -24,7 +24,7 @@ stdenv.mkDerivation (rec {
     makeheaders -local ./pargs.c
     makeheaders -local ./FileIO.c
     $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
-    $CC -m64 -O2 -std=gnu99 -I${minimus}/include FileIO.c -L${minimus}/lib -lNuClear -o FileIO
+    $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include FileIO.c -L${minimus}/lib -lNuClear -o FileIO
   '';
 
   installPhase = ''
