@@ -1,4 +1,4 @@
-#!/run/current-system/sw/bin/tcc -run
+// #!/run/current-system/sw/bin/tcc -run
 
 // Copyright (C) 2023-2026 Roy Pfund. All rights reserved.
 //
@@ -37,29 +37,7 @@
 // ctype  limits   stdbool tgmath errno   locale stddef time
 // fenv   math     stdint  wchar  float   setjmp stdio  wctype
 #include <annexb.h> // ^^ includes above .h files ^^  [p419N1256]
-#include <eval_ops.h> /*///////////////////////////Evaluative Ops
-// mul(){ a * b } // b_shl(){ a << b } //   rel_eq(){ a == b } //
-// div(){ a / b } // b_shr(){ a >> b } //  rel_neq(){ a != b } //
-// add(){ a + b } // b_and(){ a & b  } //   rel_lt(){ a < b  } //
-// sub(){ a - b } // b_xor(){ a ^ b  } // rel_lteq(){ a <= b } //
-// mod(){ a % b } //  b_or(){ a | b  } //   rel_gt(){ a > b  } //
-// numinv(){ -a } // b_not(){ ~a     } // rel_gteq(){ a >= b } //
-// b_set(){ a }   // b_get(){ a }      //   assign(){ a }      //
-// b_rol(){ a }   // b_ror(){ a }      //                      //
-//////eval_ops.h provides language built-in functions above//////
-// in the style `mulT8S(*dest, *a, *b) { a * b }` for          //
-// pun-types:T8S T8U T16S T16U T32S T32U T32F T64S T64U T64F   //
-//////////funcs in the style above, only modifies *dest//////////
-// Category // 8-bits   // 16-bits   // 32-bits    // 64-bits  //
-// Unsigned // uint8_t  // uint16_t  // uint32_t   // uint64_t //
-// PRINTF-U // %"PRIu8" // %"PRIu16" // %"PRIu32"  // %"PRIu64"//
-// Signed   // int8_t   // int16_t   // int32_t    // int64_t  //
-// PRINTF-S // %"PRIi8" // %"PRIi16" // %"PRIi32"  // %"PRIi64"//
-// FLOATING // XXXXXX   // XXXXXX    // float32_t  // float64_t//
-// PRINTF-F // XXXXXX   // XXXXXX    // %.6E       // %.15E    //
-// PUNNING  // T8       // T16       // T32        // T64      //
-// PRINTF-X // %"PRIX8" // %"PRIX16" // %"PRIX32"  // %"PRIX64"//
-////////////////////////////////// End Evaluative Ops Summary*///
+/* eval_ops.h excluded from FileIO.c — not used here */
 
 /*///////////////////////////////
 This C code reads a file "in.txt" to a data struct
@@ -68,6 +46,9 @@ then writes it to another file "out.txt"
 
 #include <lldeck.h>
 #include <NuClear.h>
+
+#if !INTERFACE
+DEFINE_LLDECK(uint8_t)
 
 typedef struct {
     uint16_t y; // max_val = ?
@@ -78,17 +59,13 @@ typedef struct {
     uint16_t s : 6; // max_val = 60
 } date;
 
-typedef struct LLNode_uint8_t LLNode_uint8_t;
-typedef struct LLDeck_uint8_t LLDeck_uint8_t;
+#endif
 
 #include <set_priv.h>/*////////////////////////////////////////*/
 // include automated local declarations last needs
 #include "FileIO.h" // generate with makeheaders
 /////////////////////////////////////////////////////////////////
 
-#if !INTERFACE
-DEFINE_LLDECK(uint8_t)
-#endif
 
 
 /////////////////////////////////
