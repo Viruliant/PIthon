@@ -39,26 +39,11 @@
 #include <annexb.h> // ^^ includes above .h files ^^  [p419N1256]
 /* eval_ops.h excluded from FileIO.c — not used here */
 
-/*///////////////////////////////
-This C code reads a file "in.txt" to a data struct
-then writes it to another file "out.txt"
-///////////////////////////////*/
-
 #include <lldeck.h>
 #include <NuClear.h>
 
 #if !INTERFACE
 DEFINE_LLDECK(uint8_t)
-
-typedef struct {
-    uint16_t y; // max_val = ?
-    uint16_t m : 4; // max_val = 12
-    uint16_t d : 5; // max_val = 31
-    uint16_t h : 5; // max_val = 24
-    uint16_t n : 6; // max_val = 60
-    uint16_t s : 6; // max_val = 60
-} date;
-
 #endif
 
 #include <set_priv.h>/*////////////////////////////////////////*/
@@ -66,10 +51,18 @@ typedef struct {
 #include "testFileIO.h" // generate with makeheaders
 /////////////////////////////////////////////////////////////////
 
+/*///////////////////////////////
+This C code reads a file "in.txt" to a data struct
+then writes it to another file "out.txt"
+example output:
 
+Restored timestamp from file: 2026.08.05T12.15.15Z
+New timestamp written to ./timestamp.buf
+timestamp written was, 2026.08.05T13.06.35Z
+Original comparison ('tacos'): MATCH (true)
+Modified comparison ('bacos'): MISMATCH (false)
 
-/////////////////////////////////
-
+/*///////////////////////////////
 int main() {
     // read/write to structs with objct2deck() deck2objct()
 
@@ -89,15 +82,7 @@ int main() {
     taco_test();
 
     return 0;
-}/* main() currently outputs:
-
-Restored timestamp from file: 2026.08.05T12.15.15Z
-New timestamp written to ./timestamp.buf
-timestamp written was, 2026.08.05T13.06.35Z
-Original comparison ('tacos'): MATCH (true)
-Modified comparison ('bacos'): MISMATCH (false)
-
-*/
+}
 
 /////////////////////////////////
 
@@ -248,6 +233,17 @@ uint8_t get_2bit(const uint8_t *array, int index) {
 }
 
 /////////////////////////////////
+
+#if INTERFACE
+typedef struct {
+    uint16_t y; // max_val = ?
+    uint16_t m : 4; // max_val = 12
+    uint16_t d : 5; // max_val = 31
+    uint16_t h : 5; // max_val = 24
+    uint16_t n : 6; // max_val = 60
+    uint16_t s : 6; // max_val = 60
+} date;
+#endif
 
 // Function to get the current system time and pack it into the 'date' struct
 date get_system_date() {
