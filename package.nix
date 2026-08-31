@@ -22,18 +22,22 @@ stdenv.mkDerivation (rec {
 
   buildPhase = ''
     makeheaders -local ./pargs.c
+    makeheaders -local ./FileIO.c
     $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
+    $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h FileIO.c -L${minimus}/lib -lNuClear -o FileIO
   '';
 
   installPhase = ''
     runHook preInstall
     mkdir -p $out/bin
     install -Dm755 pargs $out/bin/pargs
+    install -Dm755 FileIO $out/bin/FileIO
     runHook postInstall
   '';
 
   preFixup = ''
     patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
+    patchelf --set-rpath "${minimus}/lib" $out/bin/FileIO
   '';
 
   outputs = [ "out" ];
