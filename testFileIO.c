@@ -63,7 +63,7 @@ typedef struct {
 
 #include <set_priv.h>/*////////////////////////////////////////*/
 // include automated local declarations last needs
-#include "FileIO.h" // generate with makeheaders
+#include "testFileIO.h" // generate with makeheaders
 /////////////////////////////////////////////////////////////////
 
 
