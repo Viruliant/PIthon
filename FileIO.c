@@ -78,28 +78,16 @@ typedef struct {
     uint16_t s : 6; // max_val = 60
 } date;
 
+typedef struct LLNode_uint8_t LLNode_uint8_t;
+typedef struct LLDeck_uint8_t LLDeck_uint8_t;
+
 #include <set_priv.h>/*////////////////////////////////////////*/
 // include automated local declarations last needs
 #include "FileIO.h" // generate with makeheaders
 /////////////////////////////////////////////////////////////////
 
-#if INTERFACE/* ___makeheaders Pre-Defined Constants INTERFACE */
-
-/* ____________________makeheaders Pre-Defined Data Structures */
-
-#endif // EXPORT_INTERFACE
-
-/////////////////////////////////
-
 #if !INTERFACE
-DEFINE_LLDECK(uint8_t) // creates the following funcs
-// bool Start_LLDeck_uint8_t (uint8_t **xref, LLDeck_uint8_t** pile);
-// uint64_t Size_LLDeck_uint8_t (LLDeck_uint8_t** pile);
-// bool End_LLDeck_uint8_t (uint8_t **xref, LLDeck_uint8_t** pile);
-// bool popStart_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
-// bool popEnd_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
-// void pushStart_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
-// void pushEnd_LLDeck_uint8_t (T *xref, LLDeck_uint8_t** pile);
+DEFINE_LLDECK(uint8_t)
 #endif
 
 
@@ -249,6 +237,18 @@ void taco_test(void) {
 // uint32_t = member_count
 
 #if INTERFACE
+typedef struct {
+    uint16_t y; // max_val = ?
+    uint16_t m : 4; // max_val = 12
+    uint16_t d : 5; // max_val = 31
+    uint16_t h : 5; // max_val = 24
+    uint16_t n : 6; // max_val = 60
+    uint16_t s : 6; // max_val = 60
+} date;
+
+typedef struct LLNode_uint8_t LLNode_uint8_t;
+typedef struct LLDeck_uint8_t LLDeck_uint8_t;
+
 typedef struct { // 2 bits encode 4 scenarios(1, 2, 4, 8)
     uint8_t v0 : 2; // max_val = 3
     uint8_t v1 : 2; // max_val = 3
