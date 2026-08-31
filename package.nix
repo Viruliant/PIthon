@@ -22,7 +22,7 @@ stdenv.mkDerivation (rec {
 
   buildPhase = ''
     makeheaders -local ./pargs.c
-    $CC -m64 -O2 -std=gnu99 -I${minimus}/include pargs.c -o pargs
+    $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
   '';
 
   installPhase = ''
@@ -30,6 +30,10 @@ stdenv.mkDerivation (rec {
     mkdir -p $out/bin
     install -Dm755 pargs $out/bin/pargs
     runHook postInstall
+  '';
+
+  preFixup = ''
+    patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
   '';
 
   outputs = [ "out" ];
