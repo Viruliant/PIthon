@@ -154,7 +154,9 @@ void pargs(int argc, uint8_t **argv){// *argv++ is *((char **)(argv++))
 static void test(int argc, char **argv){
     // there can be another function with the same name "test" in
     // another c file, this is normally invalid.
-    printf("test\n");
+    void * sum_ptr = zalloc_unsafe(10);
+    free(sum_ptr);
+    printf("test complete\n");
 }
 #endif
 #undef PARGS_PRIV_INTERFACE
