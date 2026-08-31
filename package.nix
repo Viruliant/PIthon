@@ -22,7 +22,7 @@ stdenv.mkDerivation (rec {
 
   buildPhase = ''
     makeheaders -local ./pargs.c
-    $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
+    $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
   '';
 
   installPhase = ''
