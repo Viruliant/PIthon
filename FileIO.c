@@ -42,14 +42,19 @@
 #include <lldeck.h>
 #include <NuClear.h>
 
-#if !INTERFACE
+#if INTERFACE
 DEFINE_LLDECK(uint8_t)
 #endif
 
 #include <set_priv.h>/*////////////////////////////////////////*/
+// Define the LLDeck_uint8_t type first so FileIO.h (which references it in
+// its prototypes) type-checks. FileIO.h's own structs are wrapped behind
+// #if !PARGS_PRIV_INTERFACE, so with PARGS_PRIV_INTERFACE=1 here they are
+// skipped and this call supplies them (no redefinition errors).
+DEFINE_LLDECK(uint8_t)
 // include automated local declarations last needs
 #include "FileIO.h" // generate with makeheaders
-/////////////////////////////////////////////////////////////////
+#include <unset_priv.h>//////////////////////////////////////////
 
 /*///////////////////////////////
 load your data to a deck
@@ -110,9 +115,9 @@ bool OBJcmprd2deck(void *xref, size_t size, LLDeck_uint8_t **deck) {
     // if (Size_LLDeck_uint8_t(deck) != size) return false; // size matches
     if (size == 0) return true;
     if (Size_LLDeck_uint8_t(deck) < size) return false; // deck is large enough
-    LLNode_uint8_t *curr = NULL;
-    if (!Start_LLDeck_uint8_t(&curr, deck)) return false;
-
+    LLNode_uint8_t *curr = (*deck)->Start;
+    // LLNode_uint8_t *curr = NULL;
+    // if (!Start_LLDeck_uint8_t(&curr, deck)) return false;
     const uint8_t *bytes = (const uint8_t *)xref;
     for (size_t i = 0; i < size; i++) {
         if (curr == NULL || curr->data != bytes[i]) {

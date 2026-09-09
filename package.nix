@@ -9,7 +9,7 @@
 # `pre{$var}`, `{$var}Phase`, and `post{$var}` for each phase
 #################################################################
 
-{ lib, stdenv, makeheaders, minimus }:
+{ lib, stdenv, makeheaders, minimus, ncurses }:
 
 stdenv.mkDerivation (rec {
   pname = "PIthon";
@@ -18,28 +18,37 @@ stdenv.mkDerivation (rec {
   src = ./.;
   
   nativeBuildInputs = [ makeheaders ];
-  buildInputs = [ minimus ];
+  buildInputs = [ minimus ncurses ];
 
-  buildPhase = ''
-    makeheaders -local ./pargs.c
-    makeheaders -local ./FileIO.c
-    makeheaders -local ./testFileIO.c
-    $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
+buildPhase = ''
+    # All auto-generated headers come from `filter-makeheaders`, the
+    # macro-aware makeheaders wrapper — never from makeheaders directly.
+    # filter-makeheaders -I${minimus}/include ./pargs.c
+    filter-makeheaders -I${minimus}/include ./FileIO.c
+    filter-makeheaders -I${minimus}/include ./testFileIO.c
+#     filter-makeheaders -I${minimus}/include ./PIthon.c
+
     $CC -c -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h FileIO.c -o FileIO.o
     $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include testFileIO.c FileIO.o -L${minimus}/lib -lNuClear -o testFileIO
+    $CC -m64 -O2 -std=gnu99 -Wno-error=return-mismatch -I${minimus}/include -I${ncurses}/include -include annexb.h -include NuClear.h PIthon.c -L${minimus}/lib -lNuClear -lncurses -o PIthon
+    # $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
   '';
 
   installPhase = ''
     runHook preInstall
     mkdir -p $out/bin
-    install -Dm755 pargs $out/bin/pargs
+#     cp PIthon.h $out/include/
+
+    # install -Dm755 pargs $out/bin/pargs
     install -Dm755 testFileIO $out/bin/testFileIO
+    install -Dm755 PIthon $out/bin/PIthon
     runHook postInstall
   '';
 
   preFixup = ''
-    patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
+    # patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
     patchelf --set-rpath "${minimus}/lib" $out/bin/testFileIO
+    patchelf --set-rpath "${minimus}/lib:${ncurses}/lib" $out/bin/PIthon
   '';
 
   outputs = [ "out" ];

@@ -39,18 +39,28 @@
 #include <annexb.h> // ^^ includes above .h files ^^  [p419N1256]
 /* eval_ops.h excluded from FileIO.c — not used here */
 
-#include <lldeck.h>
-#include <NuClear.h>
-
-#if !INTERFACE
-DEFINE_LLDECK(uint8_t)
-#endif
+#include "FileIO.h"     // generate with makeheaders
 
 #include <set_priv.h>/*////////////////////////////////////////*/
 // include automated local declarations last needs
+
+typedef struct { // 2 bits encode 4 scenarios(1, 2, 4, 8)
+    uint8_t v0 : 2; // max_val = 3
+    uint8_t v1 : 2; // max_val = 3
+    uint8_t v2 : 2; // max_val = 3
+    uint8_t v3 : 2; // max_val = 3
+} byte4vars;
+typedef struct {
+    uint16_t y; // max_val = ?
+    uint16_t m : 4; // max_val = 12
+    uint16_t d : 5; // max_val = 31
+    uint16_t h : 5; // max_val = 24
+    uint16_t n : 6; // max_val = 60
+    uint16_t s : 6; // max_val = 60
+} date;
 #include "testFileIO.h" // generate with makeheaders
-#include "FileIO.h"     // generate with makeheaders
-/////////////////////////////////////////////////////////////////
+
+#include <unset_priv.h>//////////////////////////////////////////
 
 /*///////////////////////////////
 This C code reads a file "in.txt" to a data struct
@@ -132,14 +142,6 @@ void taco_test(void) {
 
 // uint32_t = member_count
 
-#if INTERFACE
-typedef struct { // 2 bits encode 4 scenarios(1, 2, 4, 8)
-    uint8_t v0 : 2; // max_val = 3
-    uint8_t v1 : 2; // max_val = 3
-    uint8_t v2 : 2; // max_val = 3
-    uint8_t v3 : 2; // max_val = 3
-} byte4vars;
-#endif // EXPORT_INTERFACE
 
 // offsetof(byte4vars, v0) = 0
 // offsetof(byte4vars, v1) = 0
@@ -168,16 +170,6 @@ uint8_t get_2bit(const uint8_t *array, int index) {
 
 /////////////////////////////////
 
-#if INTERFACE
-typedef struct {
-    uint16_t y; // max_val = ?
-    uint16_t m : 4; // max_val = 12
-    uint16_t d : 5; // max_val = 31
-    uint16_t h : 5; // max_val = 24
-    uint16_t n : 6; // max_val = 60
-    uint16_t s : 6; // max_val = 60
-} date;
-#endif
 
 // Function to get the current system time and pack it into the 'date' struct
 date get_system_date() {
