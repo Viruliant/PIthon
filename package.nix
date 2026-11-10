@@ -9,7 +9,7 @@
 # `pre{$var}`, `{$var}Phase`, and `post{$var}` for each phase
 #################################################################
 
-{ lib, stdenv, makeheaders, minimus, ncurses }:
+{ lib, stdenv, makeheaders, minimus, ncurses, PiChudnov }:
 
 stdenv.mkDerivation (rec {
   pname = "PIthon";
@@ -18,7 +18,7 @@ stdenv.mkDerivation (rec {
   src = ./.;
   
   nativeBuildInputs = [ makeheaders ];
-  buildInputs = [ minimus ncurses ];
+  buildInputs = [ minimus ncurses PiChudnov ];
 
 buildPhase = ''
     # All auto-generated headers come from `filter-makeheaders`, the
@@ -30,7 +30,7 @@ buildPhase = ''
 
     $CC -c -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h FileIO.c -o FileIO.o
     $CC -m64 -O2 -std=gnu99 -Wno-incompatible-pointer-types -I${minimus}/include testFileIO.c FileIO.o -L${minimus}/lib -lNuClear -o testFileIO
-    $CC -m64 -O2 -std=gnu99 -Wno-error=return-mismatch -I${minimus}/include -I${ncurses}/include -include annexb.h -include NuClear.h PIthon.c -L${minimus}/lib -lNuClear -lncurses -o PIthon
+    $CC -m64 -O2 -std=gnu99 -Wno-error=return-mismatch -I${minimus}/include -I${ncurses}/include -I${PiChudnov}/include -include annexb.h -include NuClear.h PIthon.c -L${minimus}/lib -lNuClear -lncurses -L${PiChudnov}/lib -lpichudnov -o PIthon
     # $CC -m64 -O2 -std=gnu99 -I${minimus}/include -include annexb.h -include NuClear.h pargs.c -L${minimus}/lib -lNuClear -o pargs
   '';
 
@@ -48,7 +48,7 @@ buildPhase = ''
   preFixup = ''
     # patchelf --set-rpath "${minimus}/lib" $out/bin/pargs
     patchelf --set-rpath "${minimus}/lib" $out/bin/testFileIO
-    patchelf --set-rpath "${minimus}/lib:${ncurses}/lib" $out/bin/PIthon
+    patchelf --set-rpath "${minimus}/lib:${ncurses}/lib:${PiChudnov}/lib" $out/bin/PIthon
   '';
 
   outputs = [ "out" ];

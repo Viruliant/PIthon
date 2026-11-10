@@ -41,6 +41,7 @@ or just uncomment the tcc shebang
 // Float    //  XXXXXX    //   XXXXXX    //   %.6E      // %.15E
 // #include "eval_ops.h" // not used
 #include <CALLDeck.h>
+#include <PiChudnov.h>
 #include <ncurses.h>
 
 #include <set_priv.h>/*////////////////////////////////////////*/
@@ -50,7 +51,6 @@ or just uncomment the tcc shebang
 
 #include <unset_priv.h>//////////////////////////////////////////
 const uint8_t framerate = 60;
-const uint8_t snakechar = '#';
 const uint8_t applechar = '@';
 const uint8_t emptychar = ' ';
 const uint8_t width = 40;
@@ -71,6 +71,7 @@ typedef struct {
     LLDeck_CA_coord_255 *emptyspaces;
 
     uint8_t *snake_world;
+    uint8_t *snake_chars; // "3.14159..." one char per segment, head first
 
     uint16_t snake_length;
     uint16_t apple_count;
@@ -84,6 +85,25 @@ typedef struct {
     int8_t direction_x;
     int8_t direction_y;
 } GameState;
+
+// Fill chars[0..len-1] with "3.14159...": len - 1 digits of pi plus the '.'
+int fill_snake_chars(uint8_t *chars, size_t len) {
+    size_t digits = len - 1;
+    size_t words = pichudnov_words_needed(10, digits);
+    uint64_t *packed = malloc(words * sizeof *packed);
+    if (!packed) return PICHUDNOV_ERR_INTERNAL;
+
+    int rc = pichudnov_bs(10, digits, packed, words);
+    if (rc == PICHUDNOV_OK) {
+        // digit i goes to slot i + 1, leaving slot 0 free for the '3'
+        for (size_t i = 0; i < digits; i++)
+            chars[i + 1] = '0' + ((packed[i / 16] >> (60 - 4 * (i % 16))) & 0xF);
+        chars[0] = chars[1];
+        chars[1] = '.';
+    }
+    free(packed);
+    return rc;
+}
 
 void handle_input(int8_t *direction_x, int8_t *direction_y) {
     int ch = getch();
@@ -168,7 +188,7 @@ void update_world(GameState *gs) {
                 exit(0);
             }
 
-            gs->snake_world[snake_seg.y * width + snake_seg.x] = snakechar;
+            gs->snake_world[snake_seg.y * width + snake_seg.x] = gs->snake_chars[i];
             pushEnd_CALLDECK_coord_255(&snake_seg, &gs->snake);
         }
 
@@ -221,6 +241,12 @@ int main(int argc, char **argv) {
 
     srand(time(NULL));
 
+    uint8_t *snake_chars = malloc(width * height);
+    if (!snake_chars || fill_snake_chars(snake_chars, width * height) != PICHUDNOV_OK) {
+        fprintf(stderr, "PIthon: could not compute the digits of pi\n");
+        return 1;
+    }
+
     // Initialize ncurses
     initscr();
     cbreak();           // Disable line buffering
@@ -241,17 +267,21 @@ int main(int argc, char **argv) {
         .apples = zalloc(sizeof(LLDeck_CA_coord_255)),
         .emptyspaces = zalloc(sizeof(LLDeck_CA_coord_255)),
         .snake_world = malloc(width * height),
-        .snake_length = 1,
+        .snake_chars = snake_chars,
+        .snake_length = 4,
         .apple_count = 0,
         .space_count = 0,
         .apple_spawn_timer = 0,
         .frame_count = 0,
-        .direction_x = 1,
+        .direction_x = -1,
         .direction_y = 0
     };
 
-    coord snake_seg_head = { width / 2, height / 2 };
-    pushStart_CALLDECK_coord_255(&snake_seg_head, &gs.snake);
+    // "3.14" heading left, so it reads left to right at the start
+    for (uint8_t i = 0; i < gs.snake_length; i++) {
+        coord snake_seg = { width / 2 + i, height / 2 };
+        pushEnd_CALLDECK_coord_255(&snake_seg, &gs.snake);
+    }
 
     // uint8_t *snake_world = malloc(width * height);
     if (!gs.snake_world) { endwin(); return 1; }
@@ -293,6 +323,7 @@ int main(int argc, char **argv) {
 
     endwin();
     free(gs.snake_world);
+    free(gs.snake_chars);
     return 0;
 }
 
