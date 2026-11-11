@@ -50,15 +50,15 @@ or just uncomment the tcc shebang
 // #include "PIthon.h" // generate with makeheaders
 
 #include <unset_priv.h>//////////////////////////////////////////
+const uint32_t apple_spawn_interval = 60;
 const uint8_t framerate = 60;
 const uint8_t applechar = '@';
 const uint8_t emptychar = ' ';
 const uint8_t width = 40;
 const uint8_t height = 40;
-const uint8_t moves_per_second = 8;
-const uint32_t apple_spawn_interval = 60;
+const uint8_t tick_rate = 8;// moves_per_second
 
-typedef struct { uint8_t x; uint8_t y; } coord;
+typedef struct { uint8_t x, y; } coord;
 DEFINE_CALLDECK(coord, 255)
 
 typedef coord SnakeSegment;
@@ -66,22 +66,12 @@ typedef coord Apple;
 typedef coord SpaceCoord;
 
 typedef struct {
-    LLDeck_CA_coord_255 *snake;
-    LLDeck_CA_coord_255 *apples;
-    LLDeck_CA_coord_255 *emptyspaces;
-
-    uint8_t *snake_world;
-    uint8_t *snake_chars; // "3.14159..." one char per segment, head first
-
-    uint16_t snake_length;
-    uint16_t apple_count;
-    uint16_t space_count;
-
+    LLDeck_CA_coord_255 *snake, *apples, *emptyspaces;
+    uint8_t *snake_world, *snake_chars; // "3.14159..." one char per segment, head first
     uint32_t apple_spawn_timer;
+    uint16_t snake_length, apple_count, space_count;
     uint8_t frame_count;
-
     coord snake_head_new;
-
     int8_t direction_x;
     int8_t direction_y;
 } GameState;
@@ -110,15 +100,12 @@ void handle_input(int8_t *direction_x, int8_t *direction_y) {
     if (ch != ERR) {
         int8_t new_dx = *direction_x;
         int8_t new_dy = *direction_y;
-
-        switch (ch) {
-            case KEY_UP: new_dx = 0; new_dy = -1; break;
-            case KEY_DOWN: new_dx = 0; new_dy = 1; break;
-            case KEY_LEFT: new_dx = -1; new_dy = 0; break;
-            case KEY_RIGHT: new_dx = 1; new_dy = 0; break;
-            default: return;
+        switch (ch){ case KEY_UP:  new_dx = 0;  new_dy = -1;
+            break; case KEY_DOWN:  new_dx = 0;  new_dy = 1;
+            break; case KEY_LEFT:  new_dx = -1; new_dy = 0;
+            break; case KEY_RIGHT: new_dx = 1;  new_dy = 0;
+            break; default: return;
         }
-
         if (new_dx != -*direction_x || new_dy != -*direction_y) {
             *direction_x = new_dx;
             *direction_y = new_dy;
@@ -132,7 +119,7 @@ void sleepframetime() {
 
 void update_world(GameState *gs) {
 
-    if (gs->frame_count >= framerate / moves_per_second) {
+    if (gs->frame_count >= framerate / tick_rate) {
         gs->frame_count = 0;
 
         memset(gs->snake_world, emptychar, width * height);
@@ -218,7 +205,7 @@ void update_world(GameState *gs) {
 
         // spawn apple
         gs->apple_spawn_timer++;
-        if (gs->apple_spawn_timer >= moves_per_second && gs->space_count > 0) {
+        if (gs->apple_spawn_timer >= tick_rate && gs->space_count > 0) {
 
             uint16_t r = rand() % gs->space_count;
             coord chosen;
@@ -249,11 +236,11 @@ int main(int argc, char **argv) {
 
     // Initialize ncurses
     initscr();
-    cbreak();           // Disable line buffering
-    noecho();           // Don't echo pressed keys
-    keypad(stdscr, TRUE); // Enable arrow keys
+    cbreak();              // Disable line buffering
+    noecho();              // Don't echo pressed keys
+    keypad(stdscr, TRUE);  // Enable arrow keys
     nodelay(stdscr, TRUE); // Non-blocking input
-    curs_set(0);        // Hide cursor
+    curs_set(0);           // Hide cursor
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK);
 
